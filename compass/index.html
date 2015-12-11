@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Compass</title>
+  <style type="text/css">
+    #img{
+      width:100%;
+      margin: auto;
+      position:fixed;
+      left:0;
+      top:0;
+      right: 0;
+      bottom: 0;
+    }
+    #span{
+      position:fixed;
+      bottom:0;
+      font-size: 3em;
+    }
+  </style>
+</head>
+<body>
+	<img id="img" src="./compass.jpg">
+  <span id="span"></span>
+<script>
+function handlerOrientation(evt){
+  var alpha=evt.alpha;
+  var img = document.getElementById("img");
+  var span = document.getElementById("span");
+  span.innerHTML="alpha:"+alpha;
+  img.style.webkitTransform = "rotate("+alpha+"deg)";
+
+}
+window.addEventListener("deviceorientation",handlerOrientation,false);
+</script>
+</body>
+</html>

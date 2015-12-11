@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test canvas</title>
+    <style>
+        .container{
+            width:450px;
+            margin:100px auto;
+        }
+        #canvas{
+            width:400px;
+            height:400px;
+            margin:10px;
+            border:solid 10px #000;
+        }
+        .pannel{
+            text-align: center;
+        }
+        li{
+            list-style: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <canvas id="canvas">
+            你的浏览器不支持canvas
+        </canvas>
+        <div class="pannel">
+            <input type="file" id="file">
+            <button id="opposite">反色</button>
+            <button id="gray">灰色调</button>
+            <ul>
+                <li>
+                    红色通道: -<input type="range" id="red">+
+                </li>
+                <li>
+                    绿色通道: -<input type="range" id="green">+
+                </li>
+                <li>
+                    蓝色通道: -<input type="range" id="blue">+
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        window.onload=function(){
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+            var file=document.getElementById("file");
+            var imageData=null;
+            //封装滤镜方法
+            var filter={
+                redChannel:function(val){
+                    var ratio=(val-50)/100;
+                    console.log(ratio);
+                    if(ratio>0){
+                        for(var i=0;i<imageData.data.length;i+=4){
+                            imageData.data[i]=imageData.data[i]+(255-imageData.data[i])*ratio;
+                        }
+                    }else{
+                        for(var i=0;i<imageData.data.length;i+=4){
+                            imageData.data[i]=imageData.data[i]+(imageData.data[i])*ratio;
+                        }
+                    }
+                    ctx.putImageData(imageData,0,0);
+                },
+                greenChannel:function(val){
+                    var ratio=(val-50)/100;
+                    console.log(ratio);
+                    if(ratio>0){
+                        for(var i=1;i<imageData.data.length;i+=4){
+                            imageData.data[i]=imageData.data[i]+(255-imageData.data[i])*ratio;
+                        }
+                    }else{
+                        for(var i=1;i<imageData.data.length;i+=4){
+                            imageData.data[i]=imageData.data[i]+(imageData.data[i])*ratio;
+                        }
+                    }
+                    ctx.putImageData(imageData,0,0);
+                },
+                blueChannel:function(val){
+                    var ratio=(val-50)/100;
+                    console.log(ratio);
+                    if(ratio>0){
+                        for(var i=2;i<imageData.data.length;i+=4){
+                            imageData.data[i]=imageData.data[i]+(255-imageData.data[i])*ratio;
+                        }
+                    }else{
+                        for(var i=2;i<imageData.data.length;i+=4){
+                            imageData.data[i]=imageData.data[i]+(imageData.data[i])*ratio;
+                        }
+                    }
+                    ctx.putImageData(imageData,0,0);
+                },
+                oppositeColor:function(){
+                    for(var i=0;i<imageData.data.length;i+=4){
+                        imageData.data[i]=255-imageData.data[i];
+                        imageData.data[i+1]=255-imageData.data[i];
+                        imageData.data[i+2]=255-imageData.data[i];
+                    }
+                    ctx.putImageData(imageData,0,0);
+                },
+                grayColor:function(){
+                    for(var i=0;i<imageData.data.length;i+=4){
+                        var r= imageData.data[i];
+                        var g= imageData.data[i+1];
+                        var b= imageData.data[i+2];
+                        imageData.data[i]=(r * 0.272) + (g * 0.534) + (b * 0.131);
+                        imageData.data[i+1]=(r * 0.349) + (g * 0.686) + (b * 0.168);
+                        imageData.data[i+2]=(r * 0.393) + (g * 0.769) + (b * 0.189);
+                    }
+                    ctx.putImageData(imageData,0,0);
+                }
+            };
+            file.onchange=function(){
+                if(file.files.length===0) return false;
+                var reader=new FileReader();
+                reader.readAsDataURL(file.files[0]);
+                reader.onload=function(event){
+                    ctx.clearRect(0,0,canvas.width,canvas.height);
+                    var img=new Image();
+                    img.src=event.target.result;
+                    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+                    imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
+                    var red=document.getElementById("red");
+                    var blue=document.getElementById("blue");
+                    var green=document.getElementById("green");
+                    var opposite=document.getElementById("opposite");
+                    var gray=document.getElementById("gray");
+                    red.oninput=function(){
+                        filter.redChannel(this.value);
+                    }
+                    green.oninput=function(){
+                        filter.greenChannel(this.value);
+                    }
+                    blue.oninput=function(){
+                        filter.blueChannel(this.value);
+                    }
+                    opposite.onclick=function(){
+                        filter.oppositeColor();
+                    }
+                    gray.onclick=function(){
+                        filter.grayColor();
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
