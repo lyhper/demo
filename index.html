@@ -80,10 +80,11 @@
 			var passLength = null;
 			var contentValue = null;
 			var keyValue = null;
-			var rangeValue = null;
+			var rangeValue = parseInt(range.value);
 			var pass = null;
 			var temp = null; //传入hash函数的参数
-			range.onchange=function(){
+			range.oninput=function(){
+				if(rangeValue==range.value) return;
 				rangeDisplay.innerText = range.value;
 			}
 			btn.onclick=function(){
