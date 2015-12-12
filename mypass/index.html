@@ -99,8 +99,7 @@
 				keyValue = key.value;
 				if(contentValue&&keyValue){
 					rangeValue = parseInt(range.value);
-					temp = contentValue+"+"+keyValue;
-					pass = md5(temp).slice(0,rangeValue);
+					pass = md5(contentValue,keyValue).slice(0,rangeValue);
 					passDisplay.innerText = pass;
 				}else{
 					alert("请完善表单");
