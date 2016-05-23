@@ -1,0 +1,122 @@
+<html>
+<head>
+	<title>仿知乎登录页canvas动画</title>
+	<style type="text/css">
+		body{
+			margin:0;
+			background-color: #f7fafc;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+	<script type="text/javascript">
+		// 小圆点的数目
+		var count = 15;
+		// 存放所有小圆点
+		var circles = [];
+
+		var WIDTH = window.innerWidth;
+		var HEIGHT = window.innerHeight;
+		
+		var canvas = document.querySelector('#canvas');
+		canvas.width = WIDTH;
+		canvas.height = HEIGHT;
+		var cxt = canvas.getContext('2d');
+
+		// 小圆点类
+		function Circle(x, y, r, offsetX, offsetY){
+			this.x = x;
+			this.y = y;
+			this.r = r;
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
+		}
+		// 直线类
+		function Line(startX, startY, endX, endY, opacity){
+			this.startX = startX;
+			this.startY = startY;
+			this.endX = endX;
+			this.endY = endY;
+			this.opacity = opacity;
+		}
+		function drawCircle(x, y, r, offsetX, offsetY){
+			cxt.fillStyle = 'rgba(0,0,0,0.05)';
+			cxt.beginPath();
+			cxt.arc(x, y, r, 0, Math.PI*2);
+			cxt.closePath();
+			cxt.fill();
+		}
+		function drawLine(startX, startY, endX, endY, opacity){
+			cxt.strokeStyle = 'rgba(0,0,0,'+opacity+')';
+			cxt.beginPath();
+			cxt.moveTo(startX, startY);
+			cxt.lineTo(endX, endY);
+			cxt.closePath();
+			cxt.stroke();
+		}
+		// 生成某个区间内的随机整数
+		function getRandom(min, max){
+			return Math.floor(Math.random()*(max-min)+min);
+		}
+
+		function init(){
+			// 创建所有小圆点实例
+			for(var i = 0; i<count; i++){
+				var x = getRandom(0, WIDTH);
+				var y = getRandom(0, HEIGHT);
+				var r = getRandom(5, 15);
+				var offsetX = getRandom(-1, 1)/2;
+				var offsetY = getRandom(-1, 1)/2;
+				var circle = new Circle(x, y, r, offsetX, offsetY);
+				circles.push(circle);
+			}
+		}
+		// 绘制动画的每帧
+		function draw(){
+			cxt.clearRect(0, 0, WIDTH, HEIGHT);
+			// 绘制小圆点
+			for(var i = 0; i<count; i++){
+				var circle = circles[i];
+				drawCircle(circle.x, circle.y, circle.r, circle.offsetX, circle.offsetY);
+			}
+			// 绘制直线
+			for(var i = 0; i < count; i++){
+				for(var j = i; j < count; j++){
+					var startCircle = circles[i];
+					var endCircle = circles[j];
+					// 求两点间距离，距离越长，不透明度越低
+					var minusX=Math.abs(startCircle.x-endCircle.x);
+					var minusY=Math.abs(startCircle.y-endCircle.y);
+					var lineLength = Math.sqrt(minusX*minusX+minusY*minusY);
+					var temp = 1/lineLength*5;
+					var opacity = temp > 0.03 ? 0.03 : temp;
+					drawLine(startCircle.x, startCircle.y, endCircle.x, endCircle.y, opacity);
+				}
+			}
+		}
+
+		function animate(){
+			for(var i = 0; i<count; i++){
+				var circle = circles[i];
+				circle.x += circle.offsetX;
+				circle.y += circle.offsetY;
+				// 边界值判断
+				if(circle.x > WIDTH) circle.x = 0;
+				if(circle.x < 0) circle.x = WIDTH;
+				if(circle.y > HEIGHT) circle.y = 0;
+				if(circle.y < 0) circle.y = HEIGHT;
+			}
+			draw();
+			requestAnimationFrame(arguments.callee);
+		}
+
+		function run(){
+			init();
+			animate();
+		}
+	
+		window.onload = run;
+	</script>
+</body>
+</html>
